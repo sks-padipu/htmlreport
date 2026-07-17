@@ -25,7 +25,7 @@ jobs:
       - name: Run API tests
         run: |
           mkdir -p reports
-          newman run "https://getpostman.com" --apikey "X-Api-Key: ${{ secrets.POSTMAN_API_KEY }}" -r htmlextra --reporter-htmlextra-export reports/report.html
+          newman run "https://getpostman.com{{ secrets.POSTMAN_API_KEY }}" -r htmlextra --reporter-htmlextra-export reports/report.html
 
       # 4. Upload the generated report file so you can download it from GitHub
       - name: Upload HTML Test Report
