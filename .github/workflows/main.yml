@@ -1,0 +1,36 @@
+name: Automated API tests using Postman CLI
+
+on:
+  push:
+  workflow_dispatch:
+
+jobs:
+  automated-api-tests:
+    runs-on: ubuntu-latest 
+    steps:
+      - uses: actions/checkout@v4
+
+      # 1. Setup Node.js (Required to run Newman)
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      # 2. Install Newman and the HTML Extra reporter globally
+      - name: Install Newman and HTML Extra Reporter
+        run: |
+          npm install -g newman newman-reporter-htmlextra
+
+      # 3. Run your collection using Newman with your API key and Collection UID
+      - name: Run API tests
+        run: |
+          mkdir -p reports
+          newman run "https://getpostman.com{{ secrets.POSTMAN_API_KEY }}" -r htmlextra --reporter-htmlextra-export reports/report.html
+
+      # 4. Upload the generated report file so you can download it from GitHub
+      - name: Upload HTML Test Report
+        uses: actions/upload-artifact@v4
+        if: always() # This ensures the report uploads even if your API tests fail
+        with:
+          name: postman-html-report
+          path: reports/report.html
