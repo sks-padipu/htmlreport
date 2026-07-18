@@ -1,36 +1,31 @@
 name: Automated API tests using Postman CLI
 
-on:
+on: 
   push:
   workflow_dispatch:
-
 jobs:
   automated-api-tests:
-    runs-on: ubuntu-latest 
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
-      # 1. Setup Node.js (Required to run Newman)
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '24'
-
-      # 2. Install Newman and the HTML Extra reporter globally
-      - name: Install Newman and HTML Extra Reporter
+      
+      - name: Install Postman CLI
         run: |
-          npm install -g newman newman-reporter-htmlextra
-
-      # 3. Run your collection using Newman with your API key and Collection UID
+          curl -o- "https://dl-cli.pstmn.io/install/linux64.sh" | sh
+          
+      - name: Login to Postman CLI
+        run: postman login --with-api-key "${{ secrets.POSTMAN_API_KEY }}"
+        
+      # 1. Updated Step: Configured the HTML reporter and set the target output file path
       - name: Run API tests
         run: |
-          mkdir -p reports
-          newman run "https://api.getpostman.com/collection/16527715-24c48c29-43de-45f5-bd8c-a48e489b6327${{ secrets.POSTMAN_API_KEY }}" -r htmlextra --reporter-htmlextra-export reports/report.html
+          postman collection run "16527715-24c48c29-43de-45f5-bd8c-a48e489b6327" --reporters cli,html --reporter-html-export report.html
 
-      # 4. Upload the generated report file so you can download it from GitHub
-      - name: Upload HTML Test Report
+      # 2. New Step: Upload the generated report file to the GitHub Actions overview dashboard
+      - name: Upload HTML Test Report Artifact
+        if: always() # This ensures the report uploads even if a test case fails
         uses: actions/upload-artifact@v4
-        if: always() # This ensures the report uploads even if your API tests fail
         with:
           name: postman-html-report
-          path: reports/report.html
+          path: report.html
+
