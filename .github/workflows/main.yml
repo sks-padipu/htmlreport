@@ -14,7 +14,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '24'
 
       # 2. Install Newman and the HTML Extra reporter globally
       - name: Install Newman and HTML Extra Reporter
@@ -25,7 +25,7 @@ jobs:
       - name: Run API tests
         run: |
           mkdir -p reports
-          newman run "https://api.getpostman.com/collection/16527715-24c48c29-43de-45f5-bd8c-a48e489b6327 ${{ secrets.POSTMAN_API_KEY }}" -r htmlextra --reporter-htmlextra-export reports/report.html
+          newman run "https://api.getpostman.com/collection/16527715-24c48c29-43de-45f5-bd8c-a48e489b6327${{ secrets.POSTMAN_API_KEY }}" -r htmlextra --reporter-htmlextra-export reports/report.html
 
       # 4. Upload the generated report file so you can download it from GitHub
       - name: Upload HTML Test Report
